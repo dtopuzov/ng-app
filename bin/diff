@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2086
+set -o errexit
+
+SNAPSHOT_GLOB="./e2e-visual/snapshots/"
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ $BRANCH == "main" ]]; then
+    echo "Refusing to run visual tests on branch '$BRANCH'. This script should be running in a feature branch."
+    exit 1
+fi
+
+HAS_CHANGES=0
+git diff --exit-code --quiet -- $SNAPSHOT_GLOB || HAS_CHANGES=1
+
+HAS_UNTRACKED=0
+[[ $(git ls-files --others --exclude-standard $SNAPSHOT_GLOB) ]] && HAS_UNTRACKED=1
+
+if [[ $HAS_CHANGES == 0 && $HAS_UNTRACKED == 0 ]]; then
+    echo "Visual tests have detected no changes. Skipping commit."
+elif [[ $CI != true ]]; then
+    echo "Not running on CI. Skipping commit."
+else
+    echo "Found updated screenshots, pushing commit to repository..."
+    git config user.name "dtopuzov"
+    git config user.email "dtopuzov@gmail.com"
+    git add $SNAPSHOT_GLOB
+    git commit -m "chore: update visual previews" --no-verify
+    echo "Pushing new commit to ${BRANCH#*/}..."
+    git push
+fi
