@@ -7,8 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test --watch=false --browsers ChromeHeadlessNoSandbox",
-    "e2e": "jest ./e2e",
-    "e2e-visual": "jest ./e2e-visual"
+    "e2e": "jest ./e2e/*.spec.ts",
+    "e2e-visual": "jest ./e2e-visual/*.spec.ts"
   },
   "private": true,
   "dependencies": {
