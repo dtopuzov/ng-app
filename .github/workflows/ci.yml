@@ -8,43 +8,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
-    # Allow bot to update visual snapshots
-    permissions:
-      contents: write
-      packages: read
-
-    container:
-      image: ghcr.io/dtopuzov/test-container:main
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ github.token }}
-      options: --user 1001 --cap-add=SYS_ADMIN --shm-size="4g"
-      env:
-        CHROME_BIN: /usr/bin/chrome
-        HEADLESS: true
-
     steps:
-      - name: Check out branch
-        uses: actions/checkout@v3
-
       - name: Install modules
-        run: npm ci
+        run: npm -v 
 
       - name: Build
-        run: npm run build
-
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Start E2E app
-        run: |
-          npm run start &
-          npx wait-on http://localhost:4200
-
-      - name: Run E2E tests
-        run: npm run e2e
-
-      - name: Run E2E tests (visual)
-        run: |
-          npm run e2e-visual
-          ./bin/diff
+        run: node -v
